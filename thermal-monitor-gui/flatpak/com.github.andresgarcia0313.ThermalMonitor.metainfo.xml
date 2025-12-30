@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.github.andresgarcia0313.ThermalMonitor</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Thermal Monitor</name>
+  <summary>Monitor and control CPU thermal management</summary>
+
+  <description>
+    <p>
+      A lightweight thermal monitoring application for Linux laptops that displays
+      CPU and estimated keyboard temperatures with real-time updates.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Real-time CPU temperature monitoring</li>
+      <li>Keyboard temperature estimation using physics model</li>
+      <li>Thermal zone color coding (Cool to Critical)</li>
+      <li>CPU performance mode control (Performance/Comfort/Balanced/Quiet/Auto)</li>
+      <li>Target temperature setting with automatic control</li>
+      <li>Manual fan boost for rapid cooling</li>
+      <li>Temperature history graph</li>
+      <li>Responsive UI that adapts to any window size</li>
+    </ul>
+    <p>
+      Compatible with Intel and AMD processors on most Linux distributions.
+      Optimized for Lenovo IdeaPad laptops but works on other systems too.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">com.github.andresgarcia0313.ThermalMonitor.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window showing temperatures and controls</caption>
+      <image>https://raw.githubusercontent.com/andresgarcia0313/lenovo-ideapad/main/thermal-monitor-gui/screenshots/main.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/andresgarcia0313/lenovo-ideapad</url>
+  <url type="bugtracker">https://github.com/andresgarcia0313/lenovo-ideapad/issues</url>
+  <url type="vcs-browser">https://github.com/andresgarcia0313/lenovo-ideapad</url>
+
+  <developer_name>Andres Garcia</developer_name>
+
+  <provides>
+    <binary>thermal-monitor</binary>
+  </provides>
+
+  <releases>
+    <release version="1.3.0" date="2025-12-30">
+      <description>
+        <p>Responsive UI that adapts to any window size</p>
+        <ul>
+          <li>UI adapts to any window size (minimum 320x400)</li>
+          <li>Elements stack vertically on narrow windows</li>
+          <li>Font and button sizes scale with available space</li>
+          <li>Graph height adapts to window size</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.2.0" date="2025-12-30">
+      <description>
+        <p>Auto thermal control and fan boost</p>
+        <ul>
+          <li>Automatic thermal control to reach target temperature</li>
+          <li>Manual fan boost button for rapid cooling</li>
+          <li>28 unit tests for comprehensive coverage</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.1.0" date="2025-12-30">
+      <description>
+        <p>Initial release with multi-distro support</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>System</category>
+    <category>Monitor</category>
+    <category>Settings</category>
+  </categories>
+
+  <keywords>
+    <keyword>temperature</keyword>
+    <keyword>cpu</keyword>
+    <keyword>thermal</keyword>
+    <keyword>fan</keyword>
+    <keyword>cooling</keyword>
+    <keyword>monitor</keyword>
+    <keyword>laptop</keyword>
+  </keywords>
+</component>

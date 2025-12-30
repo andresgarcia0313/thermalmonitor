@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#2d2d2d"/>
+
+  <!-- Thermometer body -->
+  <rect x="54" y="20" width="20" height="60" rx="10" fill="#4a4a4a" stroke="#666" stroke-width="2"/>
+
+  <!-- Thermometer bulb -->
+  <circle cx="64" cy="90" r="18" fill="#4a4a4a" stroke="#666" stroke-width="2"/>
+
+  <!-- Mercury/temperature indicator -->
+  <rect x="58" y="35" width="12" height="45" rx="6" fill="#ff6b6b"/>
+  <circle cx="64" cy="90" r="12" fill="#ff6b6b"/>
+
+  <!-- Temperature scale marks -->
+  <rect x="76" y="25" width="8" height="2" fill="#888"/>
+  <rect x="76" y="35" width="6" height="2" fill="#888"/>
+  <rect x="76" y="45" width="8" height="2" fill="#888"/>
+  <rect x="76" y="55" width="6" height="2" fill="#888"/>
+  <rect x="76" y="65" width="8" height="2" fill="#888"/>
+
+  <!-- CPU chip indicator -->
+  <rect x="85" y="85" width="24" height="24" rx="3" fill="#3d7eaa" stroke="#5a9fd4" stroke-width="1"/>
+  <rect x="89" y="89" width="16" height="16" fill="#2d5a7b"/>
+
+  <!-- CPU pins -->
+  <rect x="88" y="82" width="3" height="3" fill="#5a9fd4"/>
+  <rect x="94" y="82" width="3" height="3" fill="#5a9fd4"/>
+  <rect x="100" y="82" width="3" height="3" fill="#5a9fd4"/>
+  <rect x="88" y="109" width="3" height="3" fill="#5a9fd4"/>
+  <rect x="94" y="109" width="3" height="3" fill="#5a9fd4"/>
+  <rect x="100" y="109" width="3" height="3" fill="#5a9fd4"/>
+</svg>

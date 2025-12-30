@@ -1,0 +1,14 @@
+# Rust
+/target/
+Cargo.lock
+
+# Flatpak build artifacts
+/.flatpak-builder/
+/build-dir/
+/repo/
+*.flatpak
+
+# IDE
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Thermal Monitor
+GenericName=CPU Temperature Monitor
+Comment=Monitor and control CPU thermal management
+Exec=thermal-monitor
+Icon=com.github.andresgarcia0313.ThermalMonitor
+Terminal=false
+Type=Application
+Categories=System;Monitor;Settings;HardwareSettings;
+Keywords=temperature;cpu;thermal;fan;cooling;performance;laptop;
+StartupNotify=true
+StartupWMClass=thermal-monitor

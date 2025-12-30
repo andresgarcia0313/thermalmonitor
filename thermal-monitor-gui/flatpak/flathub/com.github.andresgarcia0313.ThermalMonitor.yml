@@ -1,0 +1,43 @@
+app-id: com.github.andresgarcia0313.ThermalMonitor
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: thermal-monitor
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # Required for reading thermal sensors
+  - --filesystem=/sys/class/thermal:ro
+  - --filesystem=/sys/devices/system/cpu:ro
+  - --filesystem=/sys/firmware/acpi:ro
+  # Required for Lenovo-specific controls
+  - --filesystem=/sys/devices/pci0000:00:ro
+  # For pkexec to change modes
+  - --talk-name=org.freedesktop.PolicyKit1
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/thermal-monitor/cargo
+    RUST_BACKTRACE: '1'
+
+modules:
+  - name: thermal-monitor
+    buildsystem: simple
+    build-commands:
+      - cargo --offline build --release --verbose
+      - install -Dm755 target/release/thermal-monitor /app/bin/thermal-monitor
+      - install -Dm644 flatpak/com.github.andresgarcia0313.ThermalMonitor.desktop /app/share/applications/com.github.andresgarcia0313.ThermalMonitor.desktop
+      - install -Dm644 flatpak/com.github.andresgarcia0313.ThermalMonitor.metainfo.xml /app/share/metainfo/com.github.andresgarcia0313.ThermalMonitor.metainfo.xml
+      - install -Dm644 flatpak/com.github.andresgarcia0313.ThermalMonitor.svg /app/share/icons/hicolor/scalable/apps/com.github.andresgarcia0313.ThermalMonitor.svg
+    sources:
+      - type: git
+        url: https://github.com/andresgarcia0313/thermal-monitor-gui.git
+        tag: v1.3.0
+        # commit: <COMMIT_SHA>  # Add after publishing to GitHub
+      - cargo-sources.json
