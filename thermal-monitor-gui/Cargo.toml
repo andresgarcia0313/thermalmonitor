@@ -1,0 +1,29 @@
+[package]
+name = "thermal-monitor"
+version = "1.0.0"
+edition = "2021"
+authors = ["Andres Garcia"]
+description = "Minimal thermal monitoring GUI for Lenovo IdeaPad"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+eframe = { version = "0.29", default-features = false, features = [
+    "default_fonts",
+    "glow",          # OpenGL backend (lighter than wgpu)
+] }
+egui_plot = "0.29"   # For temperature history graph
+
+[dev-dependencies]
+tempfile = "3.14"    # For tests with temp files
+
+[profile.release]
+opt-level = "z"      # Optimize for size
+lto = true           # Link-time optimization
+codegen-units = 1    # Better optimization
+panic = "abort"      # Smaller binary
+strip = true         # Strip symbols
+
+[[bin]]
+name = "thermal-monitor"
+path = "src/main.rs"

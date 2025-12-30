@@ -1,0 +1,199 @@
+@startuml thermal-monitor-classes
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam defaultFontName JetBrains Mono
+skinparam backgroundColor #FEFEFE
+
+title Thermal Monitor GUI - Diagrama de Clases
+
+package "Core" {
+    class ThermalApp {
+        - state: ThermalState
+        - history: TemperatureHistory
+        - last_update: Instant
+        --
+        + new() : ThermalApp
+        + update_state()
+        + change_mode(mode: Mode) : Result<()>
+    }
+
+    class ThermalState {
+        + cpu_temp: f32
+        + keyboard_temp: f32
+        + ambient_temp: f32
+        + perf_pct: u8
+        + current_freq_mhz: u32
+        + max_freq_mhz: u32
+        + mode: Mode
+        + platform_profile: String
+        --
+        + thermal_zone() : ThermalZone
+    }
+
+    enum Mode {
+        Performance
+        Comfort
+        Balanced
+        Quiet
+        Auto
+        Unknown
+        --
+        + label() : &str
+        + color() : Color32
+        + command() : &str
+    }
+
+    enum ThermalZone {
+        Cool
+        Comfort
+        Optimal
+        Warm
+        Hot
+        Critical
+        --
+        + color() : Color32
+        + label() : &str
+    }
+
+    class TemperatureHistory {
+        - cpu_temps: VecDeque<f32>
+        - kbd_temps: VecDeque<f32>
+        - capacity: usize
+        --
+        + new(capacity: usize) : Self
+        + push(cpu: f32, kbd: f32)
+        + cpu_points() : Vec<[f64; 2]>
+        + kbd_points() : Vec<[f64; 2]>
+    }
+}
+
+package "System Interface" {
+    class SystemReader {
+        {static} + read_cpu_temp() : Result<f32>
+        {static} + read_perf_pct() : Result<u8>
+        {static} + read_current_freq() : Result<u32>
+        {static} + read_mode() : Result<Mode>
+        {static} + read_platform_profile() : Result<String>
+        {static} + calculate_keyboard_temp(cpu: f32, ambient: f32) : f32
+    }
+
+    class ModeChanger {
+        {static} + set_mode(mode: Mode) : Result<()>
+        {static} - execute_pkexec(command: &str) : Result<()>
+    }
+}
+
+package "UI Components" {
+    class MainPanel {
+        + render(ui: &mut Ui, state: &ThermalState)
+        - render_temperature_display(ui, cpu: f32, kbd: f32)
+        - render_performance_display(ui, pct: u8, freq: u32)
+        - render_mode_indicator(ui, mode: Mode)
+    }
+
+    class ControlPanel {
+        + render(ui: &mut Ui, current: Mode) : Option<Mode>
+        - render_mode_buttons(ui) : Option<Mode>
+    }
+
+    class HistoryGraph {
+        + render(ui: &mut Ui, history: &TemperatureHistory)
+        - render_plot(ui, cpu_points, kbd_points)
+    }
+
+    class ThermalGauge {
+        + render(ui: &mut Ui, temp: f32, label: &str, zone: ThermalZone)
+        - draw_arc(painter, center, radius, value, color)
+    }
+}
+
+' Relaciones
+ThermalApp *-- ThermalState : contains
+ThermalApp *-- TemperatureHistory : contains
+ThermalApp ..> SystemReader : uses
+ThermalApp ..> ModeChanger : uses
+
+ThermalState *-- Mode : has
+ThermalState ..> ThermalZone : derives
+
+MainPanel ..> ThermalGauge : uses
+MainPanel ..> ThermalState : reads
+
+ControlPanel ..> Mode : produces
+
+HistoryGraph ..> TemperatureHistory : reads
+
+@enduml
+
+@startuml thermal-monitor-sequence
+!theme plain
+skinparam defaultFontName JetBrains Mono
+skinparam backgroundColor #FEFEFE
+
+title Flujo de Actualización de Estado
+
+actor User
+participant "ThermalApp" as App
+participant "SystemReader" as Sys
+participant "UI (egui)" as UI
+
+== Loop cada 2 segundos ==
+
+App -> Sys: read_cpu_temp()
+Sys --> App: f32
+App -> Sys: read_perf_pct()
+Sys --> App: u8
+App -> Sys: read_mode()
+Sys --> App: Mode
+
+App -> App: calculate_keyboard_temp()
+App -> App: history.push(cpu, kbd)
+App -> App: state.thermal_zone()
+
+App -> UI: render()
+UI --> User: Display actualizado
+
+== Cambio de Modo ==
+
+User -> UI: click "Performance"
+UI -> App: change_mode(Performance)
+App -> ModeChanger: set_mode(Performance)
+ModeChanger -> ModeChanger: execute_pkexec("cpu-mode performance")
+ModeChanger --> App: Result<()>
+App --> UI: Feedback visual
+
+@enduml
+
+@startuml thermal-monitor-components
+!theme plain
+skinparam defaultFontName JetBrains Mono
+skinparam backgroundColor #FEFEFE
+
+title Arquitectura de Componentes
+
+package "thermal-monitor" {
+    [main.rs] as Main
+    [app.rs] as App
+    [system.rs] as System
+}
+
+cloud "Linux sysfs" {
+    file "/sys/class/thermal/*" as Thermal
+    file "/sys/devices/system/cpu/*" as CPU
+    file "/tmp/cpu-mode.current" as ModeFile
+}
+
+database "pkexec" as PKExec
+
+[cpu-mode] as CPUMode
+
+Main --> App : init
+App --> System : read
+System --> Thermal : read
+System --> CPU : read
+System --> ModeFile : read
+
+App --> PKExec : change mode
+PKExec --> CPUMode : execute
+
+@enduml
