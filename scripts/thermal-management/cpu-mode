@@ -1,0 +1,147 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════════════════
+# CPU Mode Manager v2.0 - Lenovo IdeaPad (Intel i5-1235U)
+# Incluye modo COMFORT para teclado a temperatura de dedos
+# ═══════════════════════════════════════════════════════════════════════════
+
+MODE="${1:-status}"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+NC='\033[0m'
+
+get_current_status() {
+    TEMP=$(cat /sys/class/thermal/thermal_zone10/temp 2>/dev/null | awk '{print int($1/1000)}')
+    [ -z "$TEMP" ] && TEMP=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print int($1/1000)}')
+    FREQ=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 2>/dev/null | awk '{print int($1/1000)}')
+    MAX_PERF=$(cat /sys/devices/system/cpu/intel_pstate/max_perf_pct 2>/dev/null)
+    PLATFORM=$(cat /sys/firmware/acpi/platform_profile 2>/dev/null)
+    CURRENT_MODE=$(cat /tmp/cpu-mode.current 2>/dev/null || echo "unknown")
+    TIMER_STATUS=$(systemctl is-active thermal-manager.timer 2>/dev/null || echo "inactive")
+
+    # Estimar temperatura teclado
+    KEYBOARD_EST=$((28 + (TEMP - 28) * 45 / 100))
+
+    echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║     CPU Mode Manager v2.0 - Lenovo IdeaPad i5-1235U       ║${NC}"
+    echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
+    echo -e " Modo:           ${GREEN}${CURRENT_MODE^^}${NC}"
+    echo -e " Gestión auto:   ${TIMER_STATUS}"
+    echo -e " CPU:            ${TEMP}°C"
+    echo -e " Teclado (est):  ~${KEYBOARD_EST}°C"
+    echo -e " Rendimiento:    ${MAX_PERF}% (${FREQ} MHz)"
+    echo -e " Platform:       ${PLATFORM}"
+    echo ""
+    echo -e " ${YELLOW}Modos disponibles:${NC}"
+    echo -e "   ${GREEN}cpu-mode performance${NC}  100% - Videollamadas/gaming"
+    echo -e "   ${MAGENTA}cpu-mode comfort${NC}      Teclado frío + buen rendimiento ${MAGENTA}★${NC}"
+    echo -e "   ${YELLOW}cpu-mode balanced${NC}     Balance general"
+    echo -e "   ${BLUE}cpu-mode quiet${NC}        Mínimo ruido"
+    echo -e "   ${CYAN}cpu-mode auto${NC}         Automático según temperatura"
+    echo ""
+    if [ "$TIMER_STATUS" = "active" ]; then
+        echo -e " ${GREEN}●${NC} Thermal Manager activo"
+    fi
+}
+
+set_platform() {
+    echo "$1" > /sys/firmware/acpi/platform_profile 2>/dev/null
+}
+
+set_performance() {
+    echo -e "${GREEN}[PERFORMANCE]${NC} Máximo rendimiento..."
+    systemctl stop thermal-manager.timer 2>/dev/null
+    set_platform "performance"
+    echo 100 > /sys/devices/system/cpu/intel_pstate/max_perf_pct 2>/dev/null
+    echo 20 > /sys/devices/system/cpu/intel_pstate/min_perf_pct 2>/dev/null
+    for epp in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+        echo "performance" > $epp 2>/dev/null
+    done
+    echo 0 > /sys/devices/system/cpu/intel_pstate/no_turbo 2>/dev/null
+    echo "performance" > /tmp/cpu-mode.current
+    echo -e "${GREEN}✓${NC} PERFORMANCE activo (100%, 4.4GHz)"
+    echo -e "${YELLOW}⚠${NC} El teclado se calentará. Usa 'cpu-mode comfort' al terminar"
+}
+
+set_comfort() {
+    echo -e "${MAGENTA}[COMFORT]${NC} Teclado frío + buen rendimiento..."
+    systemctl stop thermal-manager.timer 2>/dev/null
+    set_platform "balanced"
+    # Limitar a 60% para mantener CPU < 45°C → Teclado ~35°C
+    echo 60 > /sys/devices/system/cpu/intel_pstate/max_perf_pct 2>/dev/null
+    echo 10 > /sys/devices/system/cpu/intel_pstate/min_perf_pct 2>/dev/null
+    for epp in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+        echo "balance_power" > $epp 2>/dev/null
+    done
+    echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo 2>/dev/null
+    echo "comfort" > /tmp/cpu-mode.current
+    echo -e "${GREEN}✓${NC} COMFORT activo"
+    echo -e "   Teclado: ~35°C (como tus dedos)"
+    echo -e "   Rendimiento: 60% (~2.6 GHz) - suficiente para todo"
+}
+
+set_balanced() {
+    echo -e "${YELLOW}[BALANCED]${NC} Balance general..."
+    systemctl stop thermal-manager.timer 2>/dev/null
+    set_platform "balanced"
+    echo 75 > /sys/devices/system/cpu/intel_pstate/max_perf_pct 2>/dev/null
+    echo 10 > /sys/devices/system/cpu/intel_pstate/min_perf_pct 2>/dev/null
+    for epp in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+        echo "balance_performance" > $epp 2>/dev/null
+    done
+    echo 0 > /sys/devices/system/cpu/intel_pstate/no_turbo 2>/dev/null
+    echo "balanced" > /tmp/cpu-mode.current
+    echo -e "${GREEN}✓${NC} BALANCED activo (75%, ~3.3GHz)"
+}
+
+set_quiet() {
+    echo -e "${BLUE}[QUIET]${NC} Modo silencioso..."
+    systemctl stop thermal-manager.timer 2>/dev/null
+    set_platform "low-power"
+    echo 40 > /sys/devices/system/cpu/intel_pstate/max_perf_pct 2>/dev/null
+    echo 10 > /sys/devices/system/cpu/intel_pstate/min_perf_pct 2>/dev/null
+    for epp in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+        echo "power" > $epp 2>/dev/null
+    done
+    echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo 2>/dev/null
+    echo "quiet" > /tmp/cpu-mode.current
+    echo -e "${GREEN}✓${NC} QUIET activo (40%, ~1.8GHz)"
+}
+
+set_auto() {
+    echo -e "${CYAN}[AUTO]${NC} Gestión automática optimizada para confort..."
+    set_platform "balanced"
+    systemctl start thermal-manager.timer 2>/dev/null
+    /usr/local/bin/thermal-manager.sh 2>/dev/null
+    echo -e "${GREEN}✓${NC} AUTO activo - ajuste cada 30s"
+    echo -e "   Prioridad: Teclado ~35°C + máximo rendimiento posible"
+}
+
+if [[ "$MODE" != "status" ]] && [[ $EUID -ne 0 ]]; then
+    echo -e "${RED}Error:${NC} Se requiere sudo"
+    echo "Uso: sudo cpu-mode $MODE"
+    exit 1
+fi
+
+case "$MODE" in
+    performance|perf|p|video|v)
+        set_performance ;;
+    comfort|comf|c)
+        set_comfort ;;
+    balanced|balance|b)
+        set_balanced ;;
+    quiet|silent|q|s)
+        set_quiet ;;
+    auto|a)
+        set_auto ;;
+    status|"")
+        get_current_status ;;
+    *)
+        echo -e "${RED}Modo desconocido:${NC} $MODE"
+        echo "Válidos: performance, comfort, balanced, quiet, auto"
+        exit 1 ;;
+esac
