@@ -1,0 +1,10 @@
+[Unit]
+Description=Thermal Manager Timer - Gestión térmica cada 30s
+
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=30
+AccuracySec=5
+
+[Install]
+WantedBy=timers.target

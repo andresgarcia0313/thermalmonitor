@@ -1,0 +1,9 @@
+[Unit]
+Description=Thermal Manager - Gestión térmica adaptativa para Lenovo IdeaPad
+After=thermald.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/thermal-manager.sh
+StandardOutput=null
+StandardError=journal

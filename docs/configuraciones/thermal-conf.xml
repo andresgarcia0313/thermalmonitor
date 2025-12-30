@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!-- Configuración Thermald para Lenovo IdeaPad (Intel i5-1235U) -->
+<!-- Objetivo: Mantener 50-65°C para máxima vida útil -->
+<!-- Fecha: 2025-12-30 -->
+<ThermalConfiguration>
+  <Platform>
+    <Name>Lenovo IdeaPad</Name>
+    <ProductName>*</ProductName>
+    <Preference>QUIET</Preference>
+    <PIDP>1.75</PIDP>
+    <PIDI>0.30</PIDI>
+    <PIDD>0.15</PIDD>
+    <ThermalZones>
+      <ThermalZone>
+        <Type>x86_pkg_temp</Type>
+        <TripPoints>
+          <!-- 55°C: Inicio de gestión suave -->
+          <TripPoint>
+            <Temperature>55000</Temperature>
+            <type>passive</type>
+            <ControlType>SEQUENTIAL</ControlType>
+            <CoolingDevice>
+              <Type>Processor</Type>
+              <SamplingPeriod>3</SamplingPeriod>
+            </CoolingDevice>
+          </TripPoint>
+          <!-- 65°C: Reducción moderada -->
+          <TripPoint>
+            <Temperature>65000</Temperature>
+            <type>passive</type>
+            <ControlType>SEQUENTIAL</ControlType>
+            <CoolingDevice>
+              <Type>Processor</Type>
+              <SamplingPeriod>2</SamplingPeriod>
+            </CoolingDevice>
+          </TripPoint>
+          <!-- 72°C: Reducción activa -->
+          <TripPoint>
+            <Temperature>72000</Temperature>
+            <type>active</type>
+            <ControlType>PARALLEL</ControlType>
+            <CoolingDevice>
+              <Type>Processor</Type>
+              <SamplingPeriod>1</SamplingPeriod>
+            </CoolingDevice>
+          </TripPoint>
+          <!-- 80°C: Reducción agresiva -->
+          <TripPoint>
+            <Temperature>80000</Temperature>
+            <type>active</type>
+            <ControlType>PARALLEL</ControlType>
+            <CoolingDevice>
+              <Type>intel_powerclamp</Type>
+              <SamplingPeriod>1</SamplingPeriod>
+            </CoolingDevice>
+          </TripPoint>
+          <!-- 90°C: Crítico -->
+          <TripPoint>
+            <Temperature>90000</Temperature>
+            <type>critical</type>
+            <ControlType>PARALLEL</ControlType>
+          </TripPoint>
+        </TripPoints>
+      </ThermalZone>
+    </ThermalZones>
+    <CoolingDevices>
+      <CoolingDevice>
+        <Type>Processor</Type>
+        <IncDecStep>150</IncDecStep>
+        <MinState>0</MinState>
+        <MaxState>15</MaxState>
+      </CoolingDevice>
+      <CoolingDevice>
+        <Type>intel_powerclamp</Type>
+        <IncDecStep>3</IncDecStep>
+        <MinState>0</MinState>
+        <MaxState>30</MaxState>
+      </CoolingDevice>
+    </CoolingDevices>
+  </Platform>
+</ThermalConfiguration>
