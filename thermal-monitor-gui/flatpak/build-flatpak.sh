@@ -5,7 +5,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
-APP_ID="com.github.andresgarcia0313.ThermalMonitor"
+APP_ID="io.github.andresgarcia0313.ThermalMonitor"
 
 echo "=== Building Flatpak for $APP_ID ==="
 

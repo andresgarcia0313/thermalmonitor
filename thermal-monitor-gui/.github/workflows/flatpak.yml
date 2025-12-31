@@ -25,7 +25,7 @@ jobs:
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: thermal-monitor.flatpak
-          manifest-path: flatpak/com.github.andresgarcia0313.ThermalMonitor.yml
+          manifest-path: flatpak/io.github.andresgarcia0313.ThermalMonitor.yml
           cache-key: flatpak-builder-${{ github.sha }}
 
       - name: Upload Flatpak artifact

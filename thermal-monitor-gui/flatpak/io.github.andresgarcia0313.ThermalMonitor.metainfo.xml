@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.github.andresgarcia0313.ThermalMonitor</id>
+  <id>io.github.andresgarcia0313.ThermalMonitor</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>Thermal Monitor</name>
@@ -28,7 +28,7 @@
     </p>
   </description>
 
-  <launchable type="desktop-id">com.github.andresgarcia0313.ThermalMonitor.desktop</launchable>
+  <launchable type="desktop-id">io.github.andresgarcia0313.ThermalMonitor.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
