@@ -36,5 +36,5 @@ modules:
       - type: git
         url: https://github.com/andresgarcia0313/thermalmonitor.git
         tag: v1.3.2
-        commit: 4e5f26a378ef34cdfb22d83db111baf93c6172fd
+        commit: 01fae2cd2a5040059d7ce0db814ea7f32ecbd96e
       - cargo-sources.json
