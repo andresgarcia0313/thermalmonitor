@@ -11,19 +11,16 @@ finish-args:
   - --socket=fallback-x11
   - --socket=wayland
   - --device=dri
-  # Required for reading thermal sensors
   - --filesystem=/sys/class/thermal:ro
   - --filesystem=/sys/devices/system/cpu:ro
   - --filesystem=/sys/firmware/acpi:ro
-  # Required for Lenovo-specific controls
   - --filesystem=/sys/devices/pci0000:00:ro
-  # For pkexec to change modes
   - --talk-name=org.freedesktop.PolicyKit1
 
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
   env:
-    CARGO_HOME: /run/build/thermal-monitor/cargo
+    CARGO_HOME: /run/build/thermal-monitor/thermal-monitor-gui/cargo
     RUST_BACKTRACE: '1'
 
 modules:
@@ -37,9 +34,7 @@ modules:
       - install -Dm644 thermal-monitor-gui/flatpak/io.github.andresgarcia0313.ThermalMonitor.svg /app/share/icons/hicolor/scalable/apps/io.github.andresgarcia0313.ThermalMonitor.svg
     sources:
       - type: git
-        url: https://github.com/andresgarcia0313/thermal-monitor.git
-        tag: v1.3.1
-        commit: 98c2b6fe34b3bd4060beb6eb85f2e84b7be05837
-      - type: file
-        path: cargo-sources.json
-        dest: thermal-monitor-gui
+        url: https://github.com/andresgarcia0313/thermalmonitor.git
+        tag: v1.3.2
+        commit: 4e5f26a378ef34cdfb22d83db111baf93c6172fd
+      - cargo-sources.json
